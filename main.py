@@ -3,6 +3,7 @@ Main application entry point.
 """
 import tkinter as tk
 import logging
+import os
 from src.constants import (
     CREDENTIALS,
     WINDOW_WIDTH,
@@ -22,6 +23,9 @@ logger = logging.getLogger(__name__)
 def main():
     root = tk.Tk()
     root.title("Webabiq")
+    
+    # Create assets directory if it doesn't exist
+    os.makedirs("assets", exist_ok=True)
     
     # Center the window
     center_window(root, WINDOW_WIDTH, WINDOW_HEIGHT)
