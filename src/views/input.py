@@ -48,7 +48,7 @@ class InputScreen(tk.Frame):
         
         tk.Label(
             header_frame,
-            text="input",
+            text="Input",
             font=("Arial", 24, "bold"),
             bg="#FFE5E5",
             fg="#E75480"

@@ -22,7 +22,7 @@ class AccountScreen(tk.Frame):
         # Header
         tk.Label(
             self,
-            text="account book",
+            text="Account Book",
             font=("Arial", 32, "bold"),
             bg="#FFB6C1",
             fg="#E75480"
