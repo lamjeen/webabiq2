@@ -1,14 +1,18 @@
 """
-Splash screen view.
+Splash screen view with video support.
 """
 import tkinter as tk
-from PIL import Image, ImageTk
+from tkinter import ttk
 import os
+import threading
+import cv2
+from PIL import Image, ImageTk
 
 class SplashScreen(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
+        self.is_playing = False
         
         # Configure pink background
         self.configure(bg="#FFB6C1")
@@ -17,58 +21,74 @@ class SplashScreen(tk.Frame):
         # Create assets directory if it doesn't exist
         os.makedirs("assets", exist_ok=True)
         
-        # Bind resize event
-        self.bind('<Configure>', self.on_resize)
+        # Create and display the video
+        self.create_video_player()
         
-        # Create and display the logo
-        self.create_logo()
-    
-    def create_logo(self):
-        self.logo_path = os.path.join("assets", "gif.MOV")
+    def create_video_player(self):
+        self.video_path = os.path.join("assets", "gif.mp4")
         
-        if os.path.exists(self.logo_path):
+        if os.path.exists(self.video_path):
             try:
-                # Load original image
-                self.original_image = Image.open(self.logo_path)
-                self.update_logo_size()
+                # Create a label to display video frames
+                self.video_label = tk.Label(self, bg="#FFB6C1")
+                self.video_label.pack(expand=True)
+                
+                # Start video playback in a separate thread
+                self.is_playing = True
+                self.video_thread = threading.Thread(target=self.play_video)
+                self.video_thread.daemon = True
+                self.video_thread.start()
+                
             except Exception as e:
-                print(f"Error loading image: {e}")
+                print(f"Error setting up video player: {e}")
                 self.show_fallback_text()
         else:
-            print(f"Logo file not found at: {self.logo_path}")
+            print(f"Video file not found at: {self.video_path}")
             self.show_fallback_text()
     
-    def update_logo_size(self):
+    def play_video(self):
+        """Play the video file"""
         try:
-            # Get current frame size
-            frame_width = self.winfo_width()
-            frame_height = self.winfo_height()
+            cap = cv2.VideoCapture(self.video_path)
             
-            if frame_width > 1 and frame_height > 1:  # Ensure valid dimensions
-                # Resize image to fill frame
-                resized_image = self.resize_image(self.original_image, (frame_width, frame_height))
-                photo = ImageTk.PhotoImage(resized_image)
+            while self.is_playing:
+                ret, frame = cap.read()
+                if not ret:
+                    # Reset to beginning of video when it ends
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    continue
                 
-                # Remove old label if exists
-                for widget in self.winfo_children():
-                    widget.destroy()
+                # Convert frame from BGR to RGB
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 
-                # Create new label with updated image
-                logo_label = tk.Label(self, image=photo, bg="#FFB6C1")
-                logo_label.image = photo  # Keep a reference!
-                logo_label.pack(fill="both", expand=True)
+                # Convert to PIL Image
+                image = Image.fromarray(frame_rgb)
+                
+                # Resize image to fit the window
+                image = self.resize_image(image, (self.winfo_width(), self.winfo_height()))
+                
+                # Convert to PhotoImage
+                photo = ImageTk.PhotoImage(image=image)
+                
+                # Update label with new frame
+                self.video_label.configure(image=photo)
+                self.video_label.image = photo
+                
+                # Control frame rate
+                cv2.waitKey(33)  # approximately 30 fps
+            
+            cap.release()
+            
         except Exception as e:
-            print(f"Error updating logo size: {e}")
+            print(f"Error playing video: {e}")
             self.show_fallback_text()
-    
-    def on_resize(self, event):
-        """Handle window resize events"""
-        if hasattr(self, 'original_image'):
-            self.update_logo_size()
     
     def resize_image(self, image, size):
         """Resize image to fill frame while maintaining aspect ratio"""
         target_width, target_height = size
+        if target_width <= 1 or target_height <= 1:
+            return image
+            
         original_width, original_height = image.size
         
         width_ratio = target_width / original_width
@@ -80,7 +100,7 @@ class SplashScreen(tk.Frame):
         return image.resize(new_size, Image.Resampling.LANCZOS)
     
     def show_fallback_text(self):
-        """Show fallback text when image cannot be loaded"""
+        """Show fallback text when video cannot be loaded"""
         for widget in self.winfo_children():
             widget.destroy()
             
@@ -92,3 +112,10 @@ class SplashScreen(tk.Frame):
             fg="#FF69B4"
         )
         label.pack(expand=True)
+    
+    def destroy(self):
+        """Clean up resources before destroying the widget"""
+        self.is_playing = False
+        if hasattr(self, 'video_thread'):
+            self.video_thread.join(timeout=1.0)
+        super().destroy()
