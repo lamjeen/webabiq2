@@ -79,17 +79,6 @@ class LoginScreen(tk.Frame):
         self.password_entry.bind('<Return>', lambda e: self.login())
         self.username_entry.bind('<Return>', lambda e: self.password_entry.focus())
         
-        # Remember me
-        self.remember_var = tk.BooleanVar()
-        remember_check = tk.Checkbutton(
-            self.login_container,
-            text="REMEMBER ME",
-            variable=self.remember_var,
-            bg="white",
-            font=("Arial", 10)
-        )
-        remember_check.pack(pady=(0, 20))
-        
         # Login button
         tk.Button(
             self.login_container,
@@ -102,18 +91,6 @@ class LoginScreen(tk.Frame):
             width=25,
             cursor="hand2"
         ).pack(pady=(0, 20), ipady=8)
-        
-        # Forgot password
-        forgot_link = tk.Label(
-            self.login_container,
-            text="FORGOT MY PASSWORD?",
-            font=("Arial", 10, "underline"),
-            fg="#666666",
-            cursor="hand2",
-            bg="white"
-        )
-        forgot_link.pack(pady=(0, 20))
-        forgot_link.bind("<Button-1>", self.forgot_password)
         
         # Add bottom logo
         self.add_bottom_logo()
