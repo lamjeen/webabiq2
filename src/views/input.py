@@ -2,14 +2,17 @@
 Input screen for transactions.
 """
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 from datetime import datetime
-import os
+from src.constants import (
+    PINK_GRADIENT_START,
+    PINK_GRADIENT_END,
+    PINK_BUTTON,
+    LIGHT_CREAM,
+    DARK_TEXT
+)
 from src.utils.validation import validate_amount
-from src.views.components.background_frame import BackgroundFrame
-from src.views.components.header_frame import HeaderFrame
-from src.views.components.transaction_type_frame import TransactionTypeFrame
-from src.views.components.input_frame import InputFrame
+from src.components.toggle_button import ToggleButton
 
 class InputScreen(tk.Frame):
     def __init__(self, parent, account_data, on_complete=None, on_back=None):
@@ -19,86 +22,130 @@ class InputScreen(tk.Frame):
         self.on_complete = on_complete
         self.on_back = on_back
         
+        # Initialize UI
         self.setup_ui()
         self.pack(fill="both", expand=True)
     
     def setup_ui(self):
         """Setup the user interface components"""
-        # Background image (placed first to be at the bottom)
-        bg_path = os.path.join("assets", "bg1.png")
-        self.bg_frame = BackgroundFrame(self, bg_path)
-        self.bg_frame.place(x=0, y=0, relwidth=1, relheight=1)
+        # Create gradient background (yellow to pink)
+        self.configure(bg="#FFE5E5")
         
-        # Main content container
-        self.content_frame = tk.Frame(self)
-        self.content_frame.configure(bg='')  # Transparent
-        self.content_frame.pack(fill="both", expand=True)
+        # Header with back button and title
+        header_frame = tk.Frame(self, bg="#FFE5E5")
+        header_frame.pack(fill="x", padx=20, pady=20)
         
-        # Header
-        self.header = HeaderFrame(
-            self.content_frame,
-            "Input",
-            self.return_to_account
+        back_button = tk.Button(
+            header_frame,
+            text="←",
+            font=("Arial", 24),
+            bg="#FFE5E5",
+            fg="#E75480",
+            bd=0,
+            command=self.return_to_account,
+            cursor="hand2"
         )
-        self.header.pack(fill="x", padx=20, pady=20)
+        back_button.pack(side="left")
         
-        # Transaction type
-        self.type_frame = TransactionTypeFrame(self.content_frame)
-        self.type_frame.pack(fill="x", padx=20, pady=10)
+        tk.Label(
+            header_frame,
+            text="Input",
+            font=("Arial", 24, "bold"),
+            bg="#FFE5E5",
+            fg="#E75480"
+        ).pack(side="left", padx=20)
         
-        # Input fields
-        self.setup_input_fields()
+        # Transaction type toggle
+        type_frame = tk.Frame(self, bg="white", bd=0)
+        type_frame.pack(fill="x", padx=20, pady=10)
         
-        # Save button
-        self.setup_save_button()
-    
-    def setup_input_fields(self):
-        """Setup input fields for date, amount, and description"""
+        self.transaction_type = tk.StringVar(value="Income")
+        
+        # Create toggle buttons using custom component
+        self.paid_button = ToggleButton(
+            type_frame,
+            text="PAID",
+            value="Paid",
+            variable=self.transaction_type
+        )
+        self.paid_button.pack(side="left", expand=True)
+        
+        self.income_button = ToggleButton(
+            type_frame,
+            text="INCOME",
+            value="Income",
+            variable=self.transaction_type
+        )
+        self.income_button.pack(side="right", expand=True)
+        
         # Date input
-        date_frame = InputFrame(self.content_frame, "DATE")
+        date_frame = tk.Frame(self, bg="#E75480", bd=0)
         date_frame.pack(fill="x", padx=20, pady=10)
         
+        tk.Label(
+            date_frame,
+            text="DATE",
+            font=("Arial", 14, "bold"),
+            bg="#E75480",
+            fg="white"
+        ).pack(side="left", padx=20, pady=15)
+        
         self.date_entry = tk.Entry(
-            date_frame.content,
+            date_frame,
             font=("Arial", 14),
             bg="#FFE4E1",
             fg="#666666",
             bd=0
         )
-        self.date_entry.pack(fill="x")
+        self.date_entry.pack(side="right", padx=20, pady=15, fill="x", expand=True)
         self.date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
         
         # Amount input
-        amount_frame = InputFrame(self.content_frame, "AMOUNT")
+        amount_frame = tk.Frame(self, bg="#E75480", bd=0)
         amount_frame.pack(fill="x", padx=20, pady=10)
         
+        tk.Label(
+            amount_frame,
+            text="AMOUNT",
+            font=("Arial", 14, "bold"),
+            bg="#E75480",
+            fg="white"
+        ).pack(side="left", padx=20, pady=15)
+        
         self.amount_entry = tk.Entry(
-            amount_frame.content,
+            amount_frame,
             font=("Arial", 14),
             bg="#FFE4E1",
             fg="#666666",
             bd=0
         )
-        self.amount_entry.pack(fill="x")
+        self.amount_entry.pack(side="right", padx=20, pady=15, fill="x", expand=True)
         
         # Description input
-        description_frame = InputFrame(self.content_frame, "DESCRIPTION")
+        description_frame = tk.Frame(self, bg="#E75480", bd=0)
         description_frame.pack(fill="x", padx=20, pady=10)
         
+        tk.Label(
+            description_frame,
+            text="DESCRIPTION",
+            font=("Arial", 14, "bold"),
+            bg="#E75480",
+            fg="white"
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+        
         self.description_text = tk.Text(
-            description_frame.content,
+            description_frame,
             font=("Arial", 14),
             bg="#FFE4E1",
             fg="#666666",
             bd=0,
             height=8
         )
-        self.description_text.pack(fill="both")
-    
-    def setup_save_button(self):
-        """Setup save button"""
+        self.description_text.pack(padx=20, pady=(5, 15), fill="both")
+        
+        # Save button at the bottom
         tk.Button(
-            self.content_frame,
+            self,
             text="SAVE",
             command=self.save_transaction,
             bg="#E75480",
@@ -136,7 +183,7 @@ class InputScreen(tk.Frame):
         # Add transaction
         self.account_data.add_transaction(
             amount=amount,
-            category=self.type_frame.get_type(),
+            category=self.transaction_type.get(),
             description=description,
             date=transaction_date
         )
