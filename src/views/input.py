@@ -12,6 +12,7 @@ from src.constants import (
     DARK_TEXT
 )
 from src.utils.validation import validate_amount
+from src.components.toggle_button import ToggleButton
 
 class InputScreen(tk.Frame):
     def __init__(self, parent, account_data, on_complete=None, on_back=None):
@@ -60,35 +61,22 @@ class InputScreen(tk.Frame):
         
         self.transaction_type = tk.StringVar(value="Income")
         
-        paid_button = tk.Radiobutton(
+        # Create toggle buttons using custom component
+        self.paid_button = ToggleButton(
             type_frame,
             text="PAID",
-            variable=self.transaction_type,
             value="Paid",
-            bg="white",
-            fg="#666666",
-            font=("Arial", 12, "bold"),
-            selectcolor="white",
-            indicatoron=False,
-            width=15,
-            pady=10
+            variable=self.transaction_type
         )
-        paid_button.pack(side="left", expand=True)
+        self.paid_button.pack(side="left", expand=True)
         
-        income_button = tk.Radiobutton(
+        self.income_button = ToggleButton(
             type_frame,
             text="INCOME",
-            variable=self.transaction_type,
             value="Income",
-            bg="#E75480",
-            fg="white",
-            font=("Arial", 12, "bold"),
-            selectcolor="#E75480",
-            indicatoron=False,
-            width=15,
-            pady=10
+            variable=self.transaction_type
         )
-        income_button.pack(side="right", expand=True)
+        self.income_button.pack(side="right", expand=True)
         
         # Date input
         date_frame = tk.Frame(self, bg="#E75480", bd=0)
