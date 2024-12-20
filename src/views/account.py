@@ -284,7 +284,7 @@ class AccountScreen(tk.Frame):
                 bg="white",
                 anchor=self.columns["DESCRIPTION"]["anchor"],
                 justify="left",
-                wraplength=300  # Adjust this value based on your needs
+                wraplength=150  # Adjust this value based on your needs
             )
             description_label.pack(side="left", padx=5, fill="x", expand=True)
         
