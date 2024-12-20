@@ -9,9 +9,6 @@ from datetime import datetime, date, timedelta
 from PIL import Image, ImageTk
 from tkinter import ttk, messagebox, PhotoImage
 
-# Setup basic logging configuration
-
-
 """
 Core Constants:
 - CREDENTIALS: Simple user authentication dictionary
@@ -227,22 +224,15 @@ class SplashScreen(tk.Frame):
         """Sets up video player or shows fallback"""
         self.video_path = os.path.join("assets", "gif.mp4")
         
-        if os.path.exists(self.video_path):
-            try:
-                self.video_label = tk.Label(self, bg="#FFB6C1")
-                self.video_label.pack(expand=True)
+        
+        self.video_label = tk.Label(self, bg="#FFB6C1")
+        self.video_label.pack(expand=True)
                 
-                self.is_playing = True
-                self.video_thread = threading.Thread(target=self.play_video)
-                self.video_thread.daemon = True
-                self.video_thread.start()
+        self.is_playing = True
+        self.video_thread = threading.Thread(target=self.play_video)
+        self.video_thread.daemon = True
+        self.video_thread.start()
                 
-            except Exception as e:
-                print(f"Error setting up video player: {e}")
-                self.show_fallback_text()
-        else:
-            print(f"Video file not found at: {self.video_path}")
-            self.show_fallback_text()
     
     def play_video(self):
         """Handles video playback loop"""
@@ -394,17 +384,15 @@ class LoginScreen(tk.Frame):
     def add_bottom_logo(self):
         """Adds logo image to bottom of screen"""
         logo_path = os.path.join("assets", "loginlogo.png")
-        if os.path.exists(logo_path):
-            try:
-                image = Image.open(logo_path)
-                image = image.resize((50, 50), Image.Resampling.LANCZOS)
-                photo = ImageTk.PhotoImage(image)
+        
+        image = Image.open(logo_path)
+        image = image.resize((50, 50), Image.Resampling.LANCZOS)
+        photo = ImageTk.PhotoImage(image)
                 
-                logo_label = tk.Label(self, image=photo, bg="#FFB6C1")
-                logo_label.image = photo
-                logo_label.pack(side="bottom", pady=20)
-            except Exception as e:
-                print(f"Error loading bottom logo: {e}")
+        logo_label = tk.Label(self, image=photo, bg="#FFB6C1")
+        logo_label.image = photo
+        logo_label.pack(side="bottom", pady=20)
+            
     
     def login(self):
         """Handles login attempt"""
