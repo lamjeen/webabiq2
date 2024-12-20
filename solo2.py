@@ -2,7 +2,6 @@
 Main application file combining all functionality.
 """
 import tkinter as tk
-import logging
 import os
 import threading
 import cv2
@@ -11,8 +10,7 @@ from PIL import Image, ImageTk
 from tkinter import ttk, messagebox, PhotoImage
 
 # Setup basic logging configuration
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 
 """
 Core Constants:
@@ -46,14 +44,12 @@ def validate_credentials(credentials, username, password):
         return False, "Username and password are required"
     
     if username not in credentials:
-        logging.info(f"Login attempt: Username '{username}' not found")
         return False, "Invalid credentials"
         
     if credentials[username] != password:
-        logging.info(f"Login attempt: Invalid password for user '{username}'")
         return False, "Invalid credentials"
     
-    logging.info(f"Login successful for user: {username}")
+   
     return True, None
 
 def validate_amount(amount_str):
@@ -224,7 +220,7 @@ class SplashScreen(tk.Frame):
         self.configure(bg="#FFB6C1")
         self.pack(fill="both", expand=True)
         
-        os.makedirs("assets", exist_ok=True)
+       
         self.create_video_player()
         
     def create_video_player(self):
@@ -881,7 +877,7 @@ def main():
     root = tk.Tk()
     root.title("Webabiq")
     
-    os.makedirs("assets", exist_ok=True)
+
     center_window(root, WINDOW_WIDTH, WINDOW_HEIGHT)
     
     account_data = AccountData()
