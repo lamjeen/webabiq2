@@ -8,7 +8,7 @@ import threading
 import cv2
 from datetime import datetime, date, timedelta
 from PIL import Image, ImageTk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, PhotoImage
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +25,8 @@ SPLASH_DURATION = 3000
 PINK_BUTTON = "#E75480"
 LIGHT_CREAM = "#FFF5E1"
 DARK_TEXT = "#333333"
+ICON_PATH = "assets/webabiqlogo.ico"
+
 
 # Utility Functions
 def validate_credentials(credentials, username, password):
@@ -58,6 +60,8 @@ def center_window(window, width, height):
     x = (screen_width - width) // 2
     y = (screen_height - height) // 2
     window.geometry(f"{width}x{height}+{x}+{y}")
+    window.iconbitmap(ICON_PATH)
+    
 
 # Account Data Model
 class AccountData:
@@ -816,10 +820,6 @@ def main():
     
     root.after(SPLASH_DURATION, show_login)
     root.mainloop()
-
-    from tkinter import PhotoImage
-    icon = PhotoImage("assets", "webabiqlogo.png")
-    root.iconphoto(True, icon)
 
 
 if __name__ == "__main__":
